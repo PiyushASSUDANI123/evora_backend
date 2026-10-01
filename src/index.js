@@ -5,17 +5,22 @@ import ordersRouter from './routes/orders.js';
 import menuRouter from './routes/menu.js';
 import collabsRouter from './routes/collabs.js';
 import reviewsRouter from './routes/reviews.js';
+import packagesRouter from './routes/packages.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+import path from 'path';
+
 app.use(cors());
 app.use(express.json());
+app.use('/images', express.static('public/images'));
 
 app.use('/api/orders', ordersRouter);
 app.use('/api/menu', menuRouter);
+app.use('/api/packages', packagesRouter);
 app.use('/api/collabs', collabsRouter);
 app.use('/api/reviews', reviewsRouter);
 
