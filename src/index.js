@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import ordersRouter from './routes/orders.js';
 import menuRouter from './routes/menu.js';
 import collabsRouter from './routes/collabs.js';
+import reviewsRouter from './routes/reviews.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/orders', ordersRouter);
 app.use('/api/menu', menuRouter);
 app.use('/api/collabs', collabsRouter);
+app.use('/api/reviews', reviewsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Evora Backend is running' });
