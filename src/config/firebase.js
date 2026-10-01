@@ -11,15 +11,63 @@ const serviceAccount = {
   token_uri: 'https://oauth2.googleapis.com/token',
 };
 
+let isInitialized = false;
+
 if (!admin.apps.length) {
   try {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    if (serviceAccount.private_key) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      isInitialized = true;
+    } else {
+      console.log('Firebase credentials missing, falling back to mock database');
+    }
   } catch (error) {
-    console.log('Firebase admin initialization skipped (no credentials):', error.message);
+    console.log('Firebase admin initialization failed:', error.message);
   }
 }
 
-export const db = admin.firestore();
+// Very simple mock DB for local development when Firebase keys are missing
+const mockDb = {
+  data: {
+    reviews: []
+  },
+  collection: function(colName) {
+    if (!this.data[colName]) this.data[colName] = [];
+    const col = this.data[colName];
+    return {
+      get: async () => ({ docs: col.map(d => ({ id: d.id, data: () => d.data })) }),
+      add: async (data) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        col.push({ id, data });
+        return { id };
+      },
+      doc: (id) => ({
+        update: async (updates) => {
+          const doc = col.find(d => d.id === id);
+          if (doc) doc.data = { ...doc.data, ...updates };
+        },
+        delete: async () => {
+          const index = col.findIndex(d => d.id === id);
+          if (index > -1) col.splice(index, 1);
+        }
+      }),
+      orderBy: function() { return this; },
+      where: function(field, op, val) {
+        return {
+          get: async () => {
+            const filtered = col.filter(d => {
+              if (op === '==') return d.data[field] === val;
+              return true;
+            });
+            return { docs: filtered.map(d => ({ id: d.id, data: () => d.data })) };
+          }
+        };
+      }
+    };
+  }
+};
+
+export const db = isInitialized ? admin.firestore() : mockDb;
 export default admin;
