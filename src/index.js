@@ -1,13 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import ordersRouter from './routes/orders.js';
 import menuRouter from './routes/menu.js';
 import collabsRouter from './routes/collabs.js';
 import reviewsRouter from './routes/reviews.js';
 import packagesRouter from './routes/packages.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
