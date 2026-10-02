@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
   try {
     const reviewData = {
       ...req.body,
-      isApproved: false, // Default to false pending admin approval
+      isApproved: true, // Auto-approve by default as requested
       createdAt: new Date().toISOString()
     };
     const docRef = await db.collection('reviews').add(reviewData);
